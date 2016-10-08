@@ -50,7 +50,8 @@ type Config struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	} `json:"database"`
-	Datadir string `json:"data_dir"`
+	Datadir    string `json:"data_dir"`
+	RemoteHost string `json:"remotehost"`
 }
 
 type User struct {
@@ -146,6 +147,8 @@ func main() {
 		env = "local"
 	}
 	config = loadConfig("../config/" + env + ".json")
+
+	remoteHost := config.RemoteHost
 
 	db := config.Database
 	db.Host = "54.238.247.154"
@@ -379,6 +382,12 @@ func entryHandler(w http.ResponseWriter, r *http.Request) {
 
 	imageId := sha256Hex(uuid.NewUUID())
 	err = ioutil.WriteFile(config.Datadir+"/image/"+imageId+".jpg", data, 0666)
+	resp, err := http.Post("http://"+remoteHost+"/data/image/"+imageId+".jpg", "image/jpg", data)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
 	if err != nil {
 		serverError(w, err)
 		return
@@ -889,6 +898,11 @@ func updateIconHandler(w http.ResponseWriter, r *http.Request) {
 		serverError(w, err)
 		return
 	}
+	resp, err := http.Post("http://"+remoteHost+"/data/icon/"+iconId+".png", "image/png", data)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
 	_, err = dbConn.Exec(
 		"UPDATE users SET icon = ? WHERE id = ?",

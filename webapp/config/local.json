@@ -7,4 +7,5 @@
     "password": ""
   },
   "data_dir": "./data"
+  "remotehost": "54.199.247.33"
 }
