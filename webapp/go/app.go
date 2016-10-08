@@ -10,6 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -384,11 +385,12 @@ func entryHandler(w http.ResponseWriter, r *http.Request) {
 
 	imageId := sha256Hex(uuid.NewUUID())
 	err = ioutil.WriteFile(config.Datadir+"/image/"+imageId+".jpg", data, 0666)
-	resp, err := http.Post("http://"+remoteHost+"/data/image/"+imageId+".jpg", "image/jpg", bytes.NewReader(data))
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
+	doPut("http://"+remoteHost+"/data/image/"+imageId+".jpg", bytes.NewReader(data))
+	// resp, err := http.Put("http://"+remoteHost+"/data/image/"+imageId+".jpg", "image/jpg", bytes.NewReader(data))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer resp.Body.Close()
 
 	if err != nil {
 		serverError(w, err)
@@ -432,6 +434,17 @@ func entryHandler(w http.ResponseWriter, r *http.Request) {
 			"icon": baseUrl.String() + "/icon/" + user.Icon,
 		},
 	})
+}
+
+func doPut(url string, data io.Reader) {
+	req, _ := http.NewRequest("PUT", url, data)
+
+	client := new(http.Client)
+	resp, _ := client.Do(req)
+	defer resp.Body.Close()
+
+	byteArray, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(byteArray))
 }
 
 func timelineHandler(w http.ResponseWriter, r *http.Request) {
@@ -900,11 +913,12 @@ func updateIconHandler(w http.ResponseWriter, r *http.Request) {
 		serverError(w, err)
 		return
 	}
-	resp, err := http.Post("http://"+remoteHost+"/data/icon/"+iconId+".png", "image/png", bytes.NewReader(data))
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
+	doPut("http://"+remoteHost+"/data/icon/"+iconId+".png", bytes.NewReader(data))
+	// resp, err := http.Put("http://"+remoteHost+"/data/icon/"+iconId+".png", "image/png", bytes.NewReader(data))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer resp.Body.Close()
 
 	_, err = dbConn.Exec(
 		"UPDATE users SET icon = ? WHERE id = ?",
