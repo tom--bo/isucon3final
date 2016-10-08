@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
@@ -41,6 +42,7 @@ var (
 	dbConn *sql.DB
 	config *Config
 )
+var remoteHost string
 
 type Config struct {
 	Database struct {
@@ -148,7 +150,7 @@ func main() {
 	}
 	config = loadConfig("../config/" + env + ".json")
 
-	remoteHost := config.RemoteHost
+	remoteHost = config.RemoteHost
 
 	db := config.Database
 	db.Host = "54.238.247.154"
@@ -382,7 +384,7 @@ func entryHandler(w http.ResponseWriter, r *http.Request) {
 
 	imageId := sha256Hex(uuid.NewUUID())
 	err = ioutil.WriteFile(config.Datadir+"/image/"+imageId+".jpg", data, 0666)
-	resp, err := http.Post("http://"+remoteHost+"/data/image/"+imageId+".jpg", "image/jpg", data)
+	resp, err := http.Post("http://"+remoteHost+"/data/image/"+imageId+".jpg", "image/jpg", bytes.NewReader(data))
 	if err != nil {
 		panic(err)
 	}
@@ -898,7 +900,7 @@ func updateIconHandler(w http.ResponseWriter, r *http.Request) {
 		serverError(w, err)
 		return
 	}
-	resp, err := http.Post("http://"+remoteHost+"/data/icon/"+iconId+".png", "image/png", data)
+	resp, err := http.Post("http://"+remoteHost+"/data/icon/"+iconId+".png", "image/png", bytes.NewReader(data))
 	if err != nil {
 		panic(err)
 	}
