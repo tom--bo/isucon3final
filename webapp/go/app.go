@@ -148,6 +148,7 @@ func main() {
 	config = loadConfig("../config/" + env + ".json")
 
 	db := config.Database
+	db.Host = "54.238.247.154"
 	connectionString := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8",
 		db.Username, db.Password, db.Host, db.Port, db.Dbname,
