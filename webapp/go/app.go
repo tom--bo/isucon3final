@@ -153,7 +153,7 @@ func main() {
 	remoteHost = config.RemoteHost
 
 	db := config.Database
-	db.Host = "54.238.247.154"
+	db.Host = "54.238.220.181"
 	connectionString := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8",
 		db.Username, db.Password, db.Host, db.Port, db.Dbname,

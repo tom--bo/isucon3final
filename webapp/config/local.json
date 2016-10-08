@@ -6,6 +6,6 @@
     "username": "isucon",
     "password": ""
   },
-  "data_dir": "./data"
+  "data_dir": "./data",
   "remotehost": "54.199.247.33"
 }
