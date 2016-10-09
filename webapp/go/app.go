@@ -15,6 +15,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	_ "net/http/pprof"
 	"net/url"
 	"os"
 	"os/exec"
@@ -144,6 +145,10 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	rand.Seed(time.Now().Unix())
+
+	go func() {
+		log.Println(http.ListernAndServe("0.0.0.0:6060", nil))
+	}()
 
 	env := os.Getenv("ISUCON_ENV")
 	if env == "" {
