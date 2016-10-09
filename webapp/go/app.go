@@ -147,7 +147,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 
 	go func() {
-		log.Println(http.ListernAndServe("0.0.0.0:6060", nil))
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
 	}()
 
 	env := os.Getenv("ISUCON_ENV")
